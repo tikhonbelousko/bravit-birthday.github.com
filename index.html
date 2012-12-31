@@ -61,6 +61,7 @@
 			var picPlane = new Raster('plane');
 
 			picPlane.position = view.center;
+			picPlane.position.x = -300;
 			picPlane.position.y += 50;
 
 			picPlane.scale(0.7);
@@ -91,10 +92,10 @@
 				pic.position.y = init_y + 20*Math.sin(Math.exp(Math.cos(t*0.8))*2);;
 				picTitle.position.y = 100  + 10*Math.sin(t*2);
 
-				picPlane.position.x = (100 + 40*t) % (2 * view.center.x + 300);
+				picPlane.position.x = (100 + 40*t) % (2 * view.center.x + 400) - 200;
 
 				if (picPlane.position.x > (2*view.center.x) + 200) {
-					picPlane.position.y = Math.floor(Math.random() * 600) + 100
+					picPlane.position.y = Math.floor(Math.random() * 600);
 				}
 
 			    // Run through the active layer's children list and change
