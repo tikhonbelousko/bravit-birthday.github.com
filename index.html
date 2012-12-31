@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Happy Birthday!</title>
+
+		<script src="js/jquery.min.js"></script>
+		<script src="js/paper.js"></script>
+
+		<style type="text/css"> 
+			body {
+				overflow-y			: hidden;
+				overflow-x			: auto;
+			//	background-color  	: #e8f4fa;
+			}
+
+
+		</style>
+
+	</head>
+
+	<body>
+		<canvas id="mainCanvas" resize></canvas>
+		
+		<script type="text/paperscript" canvas="mainCanvas">
+			var cloudsCount = 30;
+			var velocity 	= 500;
+
+			var cloudSymbols = [
+				new Symbol(new Raster('cloud1')),
+				new Symbol(new Raster('cloud2'))
+			];
+
+			var backMiddleLayer = new Layer();  // my
+			var backLayer 	= new Layer();
+			var middleLayer = new Layer();
+			var frontLayer 	= new Layer();
+
+			var clouds = [];
+			backLayer.activate();
+
+			// Place the instances of the symbol:
+			for (var i = 0; i < cloudsCount; i++) {
+			    var symbolFactor = i / cloudsCount * 0.8;
+			    if (symbolFactor < 0.2)
+			    	symbolFactor = 0.2;
+
+			    // The center position is a random point in the view:
+			    var center = Point.random() * (view.size + 200); // plus 200 (try to avoid heap of cloud)
+
+			    var cloudSymbol = cloudSymbols[Math.floor(Math.random() * cloudSymbols.length)];
+			    var placedSymbol = cloudSymbol.place(center);
+
+			    placedSymbol.scale(symbolFactor);
+			    clouds.push(placedSymbol);
+			}
+
+			// Plane layer 
+			backMiddleLayer.activate();
+			var picPlane = new Raster('plane');
+
+			picPlane.position.x = 0;
+			picPlane.position.y = 100;
+
+			picPlane.scale(0.7);
+
+			// Middle layer
+			middleLayer.activate();
+			var pic = new Raster('bravit');
+			
+
+			// Move the raster to the center of the view
+			pic.position = view.center;
+
+			pic.scale(0.8);
+			var init_y = pic.position.y;
+
+			// Front layer for title
+			frontLayer.activate();
+
+			var picTitle = new Raster('title');
+			picTitle.position = view.center;
+			picTitle.position.y = 100;
+			picTitle.scale(0.5);
+
+			var t = 0;
+			// The onFrame function is called up to 60 times a second:
+			function onFrame(event) {
+				t += 0.04;
+				pic.position.y = init_y + 20*Math.sin(Math.exp(Math.cos(t*0.8))*2);;
+				picTitle.position.y = 100  + 10*Math.sin(t*2);
+
+				picPlane.position.x = (100 + 40*t) % (view.center.x) - 200;
+
+				if (picPlane.position.x > 1950) {
+					picPlane.position.y = Math.floor(Math.random() * 600) + 100
+				}
+
+			    // Run through the active layer's children list and change
+			    // the position of the placed symbols:
+			    for (var i = 0; i < clouds.length; i++) {
+			        var item = clouds[i];
+			        
+			        // Move the item 1/20th of its width to the right. This way
+			        // larger circles move faster than smaller circles:
+			        item.position.x += item.bounds.width / velocity;
+
+			        // If the item has left the view on the right, move it back
+			        // to the left:
+			        if (item.bounds.left > view.size.width) {
+			            item.position.x = -item.bounds.width;
+			        }
+			    }
+			}
+		</script>
+		
+		<img id="cloud1" src="img/cloud1.png" style="display:none"></img>
+		<img id="cloud2" src="img/cloud2.png" style="display:none"></img>
+		<img id="bravit" src="img/bravit.png" style="display:none"></img>
+		<img id="plane" src="img/plane.png" style="display:none"></img>
+		<img id="title" src="img/title.png" style="display:none"></img>
+	</body>
+</html>
